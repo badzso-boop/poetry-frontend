@@ -29,8 +29,9 @@ const Poem = (() => {
 
     const handleCommentDelete = async (commentId) => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
         const response = await axios.delete(
-          `http://localhost:3000/comments/${commentId}`,
+          apiUrl+`/comments/${commentId}`,
           { withCredentials: true }
         );
   
@@ -47,8 +48,9 @@ const Poem = (() => {
 
     const handleSubmit = async (poemId) => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
         const response = await axios.post(
-          `http://localhost:3000/comments/${poemId}`,
+          apiUrl+`/comments/${poemId}`,
           { commentText: commentText },
           { withCredentials: true }
         );

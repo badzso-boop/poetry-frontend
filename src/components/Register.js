@@ -15,13 +15,15 @@ const Register = () => {
     e.preventDefault();
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
       const requestBody = {
         username: username,
         email: email,
         password: password,
       };
 
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch(apiUrl+'/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

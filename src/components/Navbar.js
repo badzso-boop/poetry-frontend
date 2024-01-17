@@ -25,7 +25,8 @@ const AppNavbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/auth/logout', {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const response = await fetch(apiUrl+'/auth/logout', {
         method: 'GET',
         credentials: 'include', // Küldjük a cookie-kat a szerverrel
       });

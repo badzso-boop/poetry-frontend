@@ -20,6 +20,8 @@ const UploadPoems = () => {
     e.preventDefault();
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
       if (!user || !user.username) {
         console.error('User not logged in');
         // Kezelés, ha a felhasználó nincs bejelentkezve
@@ -32,7 +34,7 @@ const UploadPoems = () => {
         userId: user.userId, // A session-ben tárolt user_id
       };
 
-      const response = await fetch('http://localhost:3000/poems', {
+      const response = await fetch(apiUrl+'/poems', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

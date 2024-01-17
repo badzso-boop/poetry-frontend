@@ -19,9 +19,10 @@ const Profile = () => {
     try {
       // Az input mező értéke alapján állítsa be a poemId-t
       const poemIdToDelete = event.target.elements.poemId.value;
+      const apiUrl = process.env.REACT_APP_API_URL;
 
       // Axios DELETE kérés küldése a megadott poemId-vel
-      await axios.delete(`http://localhost:3000/poems/${poemIdToDelete}`, {
+      await axios.delete(apiUrl+`/poems/${poemIdToDelete}`, {
         withCredentials: true,
       });
 
@@ -38,6 +39,7 @@ const Profile = () => {
     event.preventDefault();
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL;
       const editedPoemData = editingState[poemId]?.editedPoem;
 
       if (!editedPoemData) {
@@ -46,7 +48,7 @@ const Profile = () => {
       }
 
       // Az editedPoem állapotot használhatod a frissített adatok elküldéséhez
-      await axios.put(`http://localhost:3000/poems/${poemId}`, editedPoemData, {
+      await axios.put(apiUrl+`/poems/${poemId}`, editedPoemData, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -107,10 +109,11 @@ const Profile = () => {
     try {
       // Az input mező értéke alapján állítsa be a poemId-t
       const commentIdToDelete = commentId;
+      const apiUrl = process.env.REACT_APP_API_URL;
 
       // Axios DELETE kérés küldése a megadott poemId-vel
       await axios.delete(
-        `http://localhost:3000/comments/${commentIdToDelete}`,
+        apiUrl+`/comments/${commentIdToDelete}`,
         {
           withCredentials: true,
         }
@@ -166,9 +169,11 @@ const Profile = () => {
         return;
       }
 
+      const apiUrl = process.env.REACT_APP_API_URL;
+
       // Az editedPoem állapotot használhatod a frissített adatok elküldéséhez
       await axios.put(
-        `http://localhost:3000/comments/${commentId}`,
+        apiUrl+`/comments/${commentId}`,
         editedCommentData,
         {
           withCredentials: true,
@@ -198,7 +203,8 @@ const Profile = () => {
   };
 
   const handleAlbumDelete = (albumId) => {
-    axios.delete(`http://localhost:3000/albums/delete-album/${albumId}`,{ withCredentials: true, })
+    const apiUrl = process.env.REACT_APP_API_URL;
+    axios.delete(apiUrl+`/albums/delete-album/${albumId}`,{ withCredentials: true, })
     .then((response) => {
       if (response.status === 200) {
         // A törlés sikeres
@@ -242,8 +248,9 @@ const Profile = () => {
           return;
         }
 
+        const apiUrl = process.env.REACT_APP_API_URL;
         const response = await axios.get(
-          `http://localhost:3000/users/${userid}`,
+          apiUrl+`/users/${userid}`,
           { withCredentials: true }
         );
         setUser(response.data);

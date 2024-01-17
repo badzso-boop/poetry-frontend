@@ -16,7 +16,11 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const fetchPoems = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/poems', { withCredentials: true });
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        console.log(apiUrl)
+        
+        const response = await axios.get(`${apiUrl}/poems`, { withCredentials: true });
         setPoems(response.data);
       } catch (error) {
         console.error('Error fetching poems:', error.message);
@@ -25,7 +29,9 @@ export const AppProvider = ({ children }) => {
 
     const fetchAlbums = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/albums/albums-with-poems', { withCredentials: true });
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        const response = await axios.get(apiUrl+'/albums/albums-with-poems', { withCredentials: true });
         setAlbums(response.data);
       } catch (error) {
         console.error('Error fetching albums:', error.message);

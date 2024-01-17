@@ -16,6 +16,8 @@ const UploadAlbum = () => {
   useEffect(() => {
     const fetchPoems = async () => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
         // Elkérjük a user ID-t a session-ből
         const userid = userId;
 
@@ -25,7 +27,7 @@ const UploadAlbum = () => {
           return;
         }
 
-        const response = await axios.get(`http://localhost:3000/poems/user/${userid}`, { withCredentials: true });
+        const response = await axios.get(apiUrl+`/poems/user/${userid}`, { withCredentials: true });
         setPoems(response.data);
       } catch (error) {
         console.error('Error fetching poems:', error.message);
@@ -47,6 +49,8 @@ const UploadAlbum = () => {
     e.preventDefault();
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
       if (!user || !user.username) {
         console.error('User not logged in');
         // Kezelés, ha a felhasználó nincs bejelentkezve
@@ -59,7 +63,7 @@ const UploadAlbum = () => {
         poemIds: poemIds,
       };
 
-      const response = await fetch('http://localhost:3000/albums/create-album', {
+      const response = await fetch(apiUrl+'/albums/create-album', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
