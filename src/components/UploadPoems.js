@@ -3,10 +3,14 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
+import BadgeAlert from './BadgeAlert';
+
 const UploadPoems = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const { user, setPoemUpload } = useContext(AppContext);
+  const [uploadPoemSucces, setUploadPoemSucces] = useState(null)
+  const [uploadPoemText, setUploadPoemText] = useState("")
 
   const handleTextareaChange = (e) => {
     // Szűrjük az Enter gombot, és adjunk hozzá egy sortörést a tartalomhoz
@@ -47,12 +51,16 @@ const UploadPoems = () => {
         // Sikeres vers feltöltés, kezelheted a választ itt
         console.log('Poem uploaded successfully');
         setPoemUpload(title)
+        setUploadPoemSucces(true)
+        setUploadPoemText("Sikeres vers feltöltés!")
         // Tisztítjuk az űrlap mezőket
         setTitle('');
         setContent('');
       } else {
         // Sikertelen vers feltöltés, kezelheted a választ itt
         console.error('Poem upload failed');
+        setUploadPoemSucces(false)
+        setUploadPoemText("Sikertelen vers feltöltés!")
       }
     } catch (error) {
       console.error('Error during poem upload:', error.message);
@@ -62,7 +70,7 @@ const UploadPoems = () => {
   return (
     <div>
       <h2>Vers feltöltése</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='mb-2'>
         <div className="form-group">
           <label htmlFor="title">Cím:</label>
           <input
@@ -91,6 +99,12 @@ const UploadPoems = () => {
           Mentés
         </button>
       </form>
+      {uploadPoemSucces !== null && (
+        <BadgeAlert
+          success={uploadPoemSucces}
+          text={uploadPoemText}
+        />
+      )}
     </div>
   );
 };

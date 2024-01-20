@@ -42,3 +42,8 @@
   color: white;
   opacity: 0.75;
 }
+
+.komment{
+  word-wrap: break-word; /* Szó-törés engedélyezése a szóközökön is */
+  white-space: pre-line; /* Minden sorvégi szóközt és tabulátort elhagy, egyéb szóközöket megtart */
+}

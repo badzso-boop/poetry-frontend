@@ -1,11 +1,13 @@
 // src/components/Albums.js
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 
+import axios from 'axios';
+
 const Albums = () => {
-  const { albums } = useContext(AppContext);
+  const { albums, poemUpload, albumUpload, commentUpload, setAlbums } = useContext(AppContext);
 
   const renderContentWithLineBreaks = (poem) => {
     if (!poem) return null;
@@ -19,6 +21,22 @@ const Albums = () => {
 
     return contentWithBreaks;
   };
+
+  useEffect(() => {
+    const fetchAlbums = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        const response = await axios.get(apiUrl+'/albums/albums-with-poems', { withCredentials: true });
+        setAlbums(response.data);
+      } catch (error) {
+        console.error('Error fetching albums:', error.message);
+      }
+    };
+
+    fetchAlbums();
+
+  }, [poemUpload, albumUpload, commentUpload]);
 
   return (
     <>

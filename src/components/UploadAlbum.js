@@ -4,12 +4,18 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
 
+import BadgeAlert from './BadgeAlert';
+
 const UploadAlbum = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [poemIds, setPoemIds] = useState([]);
   const [poems, setPoems] = useState([]);
   const [error, setError] = useState(null);
+
+  const [uploadAlbumSucces, setUploadAlbumSucces] = useState(null)
+  const [uploadAlbumText, setUploadAlbumText] = useState("")
+
 
   const { user, userId, setAlbumUpload } = useContext(AppContext);
   
@@ -36,7 +42,7 @@ const UploadAlbum = () => {
     };
 
     fetchPoems();
-  }, [user, userId]);
+  }, [user, userId, poemIds]);
 
   const handleCheckboxChange = (poemId) => {
     // Itt kezelheted a checkbox változását
@@ -54,6 +60,8 @@ const UploadAlbum = () => {
       if (!user || !user.username) {
         console.error('User not logged in');
         // Kezelés, ha a felhasználó nincs bejelentkezve
+        setUploadAlbumSucces(false)
+        setUploadAlbumText("Nem vagy belépve!")
         return;
       }
 
@@ -76,6 +84,9 @@ const UploadAlbum = () => {
         // Sikeres vers feltöltés, kezelheted a választ itt
         console.log('Album uploaded successfully');
         // Tisztítjuk az űrlap mezőket
+        setUploadAlbumSucces(true)
+        setUploadAlbumText("Sikeres album feltöltés!")
+
         setAlbumUpload(title)
         setTitle('');
         setContent('');
@@ -83,6 +94,8 @@ const UploadAlbum = () => {
       } else {
         // Sikertelen vers feltöltés, kezelheted a választ itt
         console.error('Album upload failed');
+        setUploadAlbumSucces(false)
+        setUploadAlbumText("Sikertelen album feltöltés!")
       }
     } catch (error) {
       console.error('Error during album upload:', error.message);
@@ -92,7 +105,7 @@ const UploadAlbum = () => {
   return (
     <div>
       <h2>Album feltöltése</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='mb-2'>
         <div className="form-group">
           <label htmlFor="title">Cím:</label>
           <input
@@ -123,12 +136,12 @@ const UploadAlbum = () => {
                 {poems.length > 0 && poems.map((poem) => (
                     <li key={poem.poem_id}>
                         <label>
-                        <input
-                            type="checkbox"
-                            value={poem.poem_id}
-                            onChange={() => handleCheckboxChange(poem.poem_id)}
-                        /> - 
-                        {poem.title}
+                          <input
+                              type="checkbox"
+                              value={poem.poem_id}
+                              onChange={() => handleCheckboxChange(poem.poem_id)}
+                              checked={poemIds.includes(poem.poem_id)}
+                          /> {poem.title}
                         </label>
                     </li>
                 ))}
@@ -138,6 +151,13 @@ const UploadAlbum = () => {
           Mentés
         </button>
       </form>
+
+      {uploadAlbumSucces !== null && (
+        <BadgeAlert
+          success={uploadAlbumSucces}
+          text={uploadAlbumText}
+        />
+      )}
     </div>
   );
 };

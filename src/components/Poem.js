@@ -5,13 +5,22 @@ import { useParams } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import axios from 'axios';
 
+import BadgeAlert from './BadgeAlert';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt, faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
+import { faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+
 const Poem = (() => {
     const { poemId } = useParams();
-    const { poems, user, userId, setCommentUpload } = useContext(AppContext);
+    const { poems, user, userId, setCommentUpload, setPoems } = useContext(AppContext);
     const [showcomment, setShowComment] = useState(false);
     const [selectedPoemIndex, setSelectedPoemIndex] = useState(null); // Új állapot
     const [commentText, setCommentText] = useState('');
     const [commented, setCommented] = useState(0)
+    const [likeCount, setLikeCount] = useState({});
+    const [fakeLike, setFakeLike] = useState(null)
+    const [fakeLikeText, setFakeLikeText] = useState("")
 
     const poem = poems[poemId]
 
@@ -84,6 +93,60 @@ const Poem = (() => {
     useEffect(() => {
     }, [commented]);
 
+    const handleLike = async (poemId) => {
+      try {
+  
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const response = await axios.post(
+          apiUrl+`/poems/like/${poemId}`,
+          {},
+          {
+            withCredentials: true,
+          }
+        );
+    
+        const message = response.data.message;
+    
+        if (message === 'Poem liked successfully.') {
+          // Ha a vers sikeresen lájkolva lett, növeljük a like-ok számát
+          setLikeCount(prevLikes => ({
+            ...prevLikes,
+            [poemId]: (prevLikes[poemId] || 0) + 1
+          }));
+          // Frissítjük a verslistát
+          setPoems(prevPoems => 
+            prevPoems.map(poem => 
+              poem.id === poemId ? { ...poem, likeDb: poem.likeDb + 1 } : poem
+            )
+          );
+        } else if (message === 'Poem like removed successfully.') {
+          // Ha a like sikeresen eltávolítva lett, csökkentjük a like-ok számát
+          setLikeCount(prevLikes => ({
+            ...prevLikes,
+            [poemId]: Math.max((prevLikes[poemId] || 0) - 1, 0)
+          }));
+          // Frissítjük a verslistát
+          setPoems(prevPoems => 
+            prevPoems.map(poem => 
+              poem.id === poemId ? { ...poem, likeDb: Math.max(poem.likeDb - 1, 0) } : poem
+            )
+          );
+        }
+      } catch (error) {
+        console.error("Hiba történt a like kérés közben", error);
+      }
+    };
+
+    const handleLikeFake = () => {
+      setFakeLike(false)
+      setFakeLikeText("Lépj be ahhoz hogy likeolni tudj!")
+  
+      setTimeout(() => {
+        setFakeLike(null);
+        setFakeLikeText("");
+      }, 2000);
+    } 
+
     
 
     return (
@@ -92,7 +155,9 @@ const Poem = (() => {
             <>
               <div>
                 <Nav.Link as={Link} to="/poems">
-                  <button class="btn btn-primary">Vissza</button>
+                  <button class="btn btn-primary">
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                  </button>
                 </Nav.Link>
                 <ul className="list-unstyled">
                     <li>
@@ -112,34 +177,29 @@ const Poem = (() => {
                           </blockquote>
 
                           <span><strong>Kommentek:</strong> {poem.comments.length === 0 ? (<span>0 db</span>) : (<></>)} </span>
-                          <ul className="list-group list-group-flush mb-4">
-                            {poem.comments.map((comment, index) => (
-                              <li
-                                key={index}
-                                className="list-group-item"
-                                data-commentid={comment.id}
-                              >
-                                <div className="card">
-                                  <div className="card-header d-flex justify-content-between">
-                                    <p className="text-left mb-0">{comment.commenter}</p>
-                                    <p className="text-right mb-0">{comment.dateCommented.split("T")[0]}</p>
-                                  </div>
-                                  <div className="card-body">
-                                    <div className="card-text d-flex justify-content-between">
-                                      <p className="text-left mb-0">{comment.commentText}</p>
-                                      {user && user.username === comment.commenter ? (<button className="text-right mb-0 btn btn-primary" onClick={(e) => {e.preventDefault();handleCommentDelete(comment.id);}}>Komment törlése</button>) : (<></>)}
-                                      
-                                      
-                                    </div>
-                                  </div>
-                                </div>
-                              </li>
-                            ))}
 
+                          {userId>0?(
+                            <button className='btn btn-primary m-2 btn-sm' onClick={() => handleLike(poem.id)}>
+                              <FontAwesomeIcon icon={faHeart} /> {likeCount[poem.id] || 0}
+                            </button>
+                          ):(
+                            <button className='btn btn-primary m-2 btn-sm' onClick={handleLikeFake}>
+                              <FontAwesomeIcon icon={faHeart} /> {likeCount[poem.id] || 0}
+                            </button>
+                          )}
+
+                          {fakeLike !== null && (
+                            <BadgeAlert
+                              success={fakeLike}
+                              text={fakeLikeText}
+                            />
+                          )}
+
+                          <ul className="list-unstyled list-group-flush mb-4">
                             {userId > 0 ? (
                               <>
                                 <li className="list-group-item">
-                                  <div className="card">
+                                  <div className="card mb-2">
                                     <div className="card-header d-flex justify-content-between">
                                       <p className="text-left mb-0">{user.username}</p>
                                       <p className="text-right mb-0">{formattedDate}</p>
@@ -169,10 +229,38 @@ const Poem = (() => {
 
                               </>
                             )}
-                          </ul>  
 
 
-                          <span><strong>Likeok: </strong> {poem.likeDb} db</span>
+                            {poem.comments.map((comment, index) => (
+                              <li
+                                key={index}
+                                className="list-group-item"
+                                data-commentid={comment.id}
+                              >
+                                <div className="card mb-2">
+                                  <div className="card-header d-flex justify-content-between">
+                                    <p className="text-left mb-0">{comment.commenter}</p>
+                                    <p className="text-right mb-0">{comment.dateCommented.split("T")[0]}</p>
+                                  </div>
+                                  <div className="card-body">
+                                    <div className="card-text d-flex justify-content-between">
+                                      <div className='row'>
+                                        <div className='col-9'>
+                                          <p className="card-text komment">
+                                            {comment.commentText}
+                                          </p>
+                                        </div>
+                                        <div className='col-3'>
+                                          {user && user.username === comment.commenter ? (<button className="text-right mb-0 btn btn-danger" onClick={(e) => {e.preventDefault();handleCommentDelete(comment.id);}}><FontAwesomeIcon icon={faTrashAlt} /></button>) : (<></>)}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+
                           {/* <ul>
                             {poem.likes.map((like, index) => (
                               <li key={index}>{like.username}</li>

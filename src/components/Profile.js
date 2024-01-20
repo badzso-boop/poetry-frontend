@@ -4,6 +4,10 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AppContext } from '../context/AppContext';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt, faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+
 const Profile = () => {
   const [poemId, setPoemId] = useState("");
   const [commentId, setCommentId] = useState("");
@@ -338,14 +342,14 @@ const Profile = () => {
                                         style={{ height: "450px" }}
                                       />
                                     </div>
-                                    <button type="submit" className="btn btn-primary mt-2 w-100">Szerkesztés</button>
+                                    <button type="submit" className="btn btn-primary mt-2 w-100"><FontAwesomeIcon icon={faPen} /></button>
                                     <button className="btn btn-primary mt-2 w-100" onClick={handleBack}>
                                     Vissza
                                   </button>
                                   </form>
                                 </>
                                 ) : (
-                                  <div className="row">
+                                  <>
                                     <div className="col-6 d-flex align-items-center justify-content-center">
                                       <form onSubmit={handleDelete}>
                                         <label>
@@ -357,29 +361,32 @@ const Profile = () => {
                                             readOnly
                                           />
                                         </label>
-                                        <button type="submit" className="btn btn-primary">
-                                          Törlés
+                                        <button type="submit" className="btn btn-danger">
+                                          <FontAwesomeIcon icon={faTrashAlt} />
                                         </button>
                                       </form>
                                     </div>
                                     <div className="col-6 d-flex align-items-center justify-content-center">
                                       <button className="btn btn-primary" onClick={() => handleEditClick(poem.id, poem)}>
-                                        Szerkesztés
+                                        <FontAwesomeIcon icon={faPen} />
                                       </button>
                                     </div>
-                                  </div>
+                                  </>
                               )}
                             </div>
 
                             <br />
-                            <span><strong>Likeok: </strong> {poem.likes.length} db</span>
-                            {/* <ul>
-                              {poem.likes.map((like, index) => (
-                                <li key={index}>{like.username}</li>
-                              ))}
-                            </ul> */}
 
-                            <h5>Kommentek: </h5>
+                            <div className="text-center">
+                              <span className="m-2"><FontAwesomeIcon icon={faHeart} /> {poem.likes.length} </span>
+                              {/* <ul>
+                                {poem.likes.map((like, index) => (
+                                  <li key={index}>{like.username}</li>
+                                ))}
+                              </ul> */}
+
+                              <span className="m-2"><FontAwesomeIcon icon={faComment} /> {poem.comments.length} </span>
+                            </div>
                             <ul className="list-group list-group-flush mb-4">
                               {poem.comments && poem.comments.map((comment, index) => (
                                 <li
@@ -393,22 +400,50 @@ const Profile = () => {
                                       <p className="text-right mb-0">{comment.dateCommented.split("T")[0]}</p>
                                     </div>
                                     <div className="card-body">
-                                      <p className="card-text">
-                                        {comment.commentText}
-                                      </p>
+                                      <div className="row">
+                                        <div className="col-6">
+                                          <p className="card-text komment">
+                                            {comment.commentText}
+                                          </p>
+                                        </div>
+                                        <div className="col-3">
+                                          <button
+                                              className="btn btn-danger m-1"
+                                              onClick={() =>
+                                                handleDeleteClickComment(comment.id)
+                                              }
+                                            >
+                                              <FontAwesomeIcon icon={faTrashAlt} />
+                                            </button>
+                                        </div>
+                                        <div className="col-3">
+                                          <button
+                                            className="btn btn-primary m-1"
+                                            onClick={() =>
+                                              handleEditClickComment(
+                                                comment.id,
+                                                comment
+                                              )
+                                            }
+                                          >
+                                            <FontAwesomeIcon icon={faPen} />
+                                          </button>
+                                        </div>
+
+                                      </div>
+                                      
 
                                       <div className="row">
                                         
                                           {(user.role === "admin" || user.username === comment.commenter) ? (
                                             <>
-                                              <div className="col">
+                                              <div className="col-12">
                                                 {editingStateComment[comment.id]?.editing ? (
                                                 <div>
                                                   <form onSubmit={(e) => handleEditSubmitComment(comment.id, e)}>
                                                     <div className="form-group">
                                                       <label htmlFor="commentText">Comment text:</label>
-                                                      <input
-                                                        type="text"
+                                                      <textarea
                                                         className="form-control"
                                                         id="commentText"
                                                         name="commentText"
@@ -416,34 +451,12 @@ const Profile = () => {
                                                         onChange={handleInputChangeComment}
                                                       />
                                                     </div>
-                                                    <button type="submit" className="btn btn-primary">Komment mentése</button>
+                                                    <button type="submit" className="btn btn-primary mt-2 w-100">Komment mentése</button>
                                                   </form>
                                                 </div>
                                               ) : (
-                                                <div>
-                                                  <button
-                                                    className="btn btn-primary m-1"
-                                                    onClick={() =>
-                                                      handleEditClickComment(
-                                                        comment.id,
-                                                        comment
-                                                      )
-                                                    }
-                                                  >
-                                                    Szerkesztés
-                                                  </button>
-                                                </div>
+                                                null
                                               )}
-                                              </div>
-                                              <div className="col">
-                                                <button
-                                                  className="btn btn-primary m-1"
-                                                  onClick={() =>
-                                                    handleDeleteClickComment(comment.id)
-                                                  }
-                                                >
-                                                  Törlés
-                                                </button>
                                               </div>
                                             </>
                                           ) : (
@@ -479,7 +492,7 @@ const Profile = () => {
                       <ul className="list-unstyled">
                         {user.albums[0].map((smallAlbum, smallindex) => (
                           <li key={smallindex}>
-                            <div className="card">
+                            <div className="card mb-4">
                               <div className="card-header">
                                 <strong>{smallAlbum.title}</strong>
                               </div>
@@ -487,7 +500,7 @@ const Profile = () => {
                                 <p className="card-text">
                                   {smallAlbum.description}
                                 </p>
-                                <button onClick={() => handleAlbumDelete(smallAlbum.album_id)} className="btn btn-primary">Törlés</button>
+                                <button onClick={() => handleAlbumDelete(smallAlbum.album_id)} className="btn btn-danger"><FontAwesomeIcon icon={faTrashAlt} /></button>
                               </div>
 
                               <ul className="list-unstyled m-2">

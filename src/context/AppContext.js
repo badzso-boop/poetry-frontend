@@ -44,7 +44,7 @@ export const AppProvider = ({ children }) => {
   }, [poemUpload, albumUpload, commentUpload]);
 
   return (
-    <AppContext.Provider value={{ albums, poems, setPoems, user, setUser, userId, setUserId, setAlbumUpload, setPoemUpload,setCommentUpload }}>
+    <AppContext.Provider value={{ albums,setAlbums, poems, setPoems, user, setUser, userId, setUserId, setAlbumUpload, setPoemUpload,setCommentUpload }}>
       {children}
     </AppContext.Provider>
   );
