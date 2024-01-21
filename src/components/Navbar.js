@@ -72,6 +72,9 @@ const AppNavbar = () => {
               Üdvözöllek, {user.username}!
             </span>
           )}
+          <Nav.Link as={Link} to="/" onClick={handleNavItemClick}>
+            Főoldal
+          </Nav.Link>
           <Nav.Link as={Link} to="/poems" onClick={handleNavItemClick}>
             Versek
           </Nav.Link>

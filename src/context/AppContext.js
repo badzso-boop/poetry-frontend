@@ -12,13 +12,12 @@ export const AppProvider = ({ children }) => {
   const [poemUpload, setPoemUpload] = useState(null)
   const [albumUpload, setAlbumUpload] = useState(null)
   const [commentUpload, setCommentUpload] = useState(null)
+  const [follow, setFollow] = useState(null)
 
   useEffect(() => {
     const fetchPoems = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
-
-        console.log(apiUrl)
         
         const response = await axios.get(`${apiUrl}/poems`, { withCredentials: true });
         setPoems(response.data);
@@ -44,7 +43,7 @@ export const AppProvider = ({ children }) => {
   }, [poemUpload, albumUpload, commentUpload]);
 
   return (
-    <AppContext.Provider value={{ albums,setAlbums, poems, setPoems, user, setUser, userId, setUserId, setAlbumUpload, setPoemUpload,setCommentUpload }}>
+    <AppContext.Provider value={{ albums,setAlbums, poems, setPoems, follow, setFollow, user, setUser, userId, setUserId, setAlbumUpload, setPoemUpload,setCommentUpload }}>
       {children}
     </AppContext.Provider>
   );

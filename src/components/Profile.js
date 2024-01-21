@@ -14,8 +14,32 @@ const Profile = () => {
   const [editingStateComment, setEditingStateComment] = useState({});
   const [editingState, setEditingState] = useState({});
   const [albumDelete, setAlbumDelete] = useState(-1)
+  const [followers, setFollowers] = useState([])
+  const [following, setFollowing] = useState([])
 
   const { user, userId, setUser } = useContext(AppContext);
+
+  const fetchFollowers = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      
+      const response = await axios.get(`${apiUrl}/follows/followers/${userId}`, { withCredentials: true });
+      setFollowers(response.data);
+    } catch (error) {
+      console.error('Error fetching poems:', error.message);
+    }
+  };
+
+  const fetchFollowing = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      
+      const response = await axios.get(`${apiUrl}/follows/following/${userId}`, { withCredentials: true });
+      setFollowing(response.data);
+    } catch (error) {
+      console.error('Error fetching poems:', error.message);
+    }
+  };
 
   const handleDelete = async (event) => {
     event.preventDefault();
@@ -264,6 +288,8 @@ const Profile = () => {
     };
 
     fetchUser();
+    fetchFollowers();
+    fetchFollowing();
   }, [poemId, editingState, commentId, editingStateComment, albumDelete]);
 
   return (
@@ -277,9 +303,17 @@ const Profile = () => {
               <strong>{user.username}</strong>
             </div> 
             <div className="card-body">
-              <p className="card-text">E-mail cím: {user.email}</p>
-              <p className="card-text">Profil kép: {user.profileImgUrl}</p>
-              <p className="card-text">Rang: {user.role}</p>
+              <div className="row">
+                  <div className="col-6">
+                    <p className="card-text">E-mail cím: {user.email}</p>
+                    <p className="card-text">Profil kép: {user.profileImgUrl}</p>
+                    <p className="card-text">Rang: {user.role}</p>
+                  </div>
+                  <div className="col-6">
+                    <p className="card-text">Követők: {followers.length}</p>
+                    <p className="card-text">Követés: {following.length}</p>
+                  </div>
+                </div>
             </div>
           </div>
         </div>
@@ -374,8 +408,6 @@ const Profile = () => {
                                   </>
                               )}
                             </div>
-
-                            <br />
 
                             <div className="text-center">
                               <span className="m-2"><FontAwesomeIcon icon={faHeart} /> {poem.likes.length} </span>

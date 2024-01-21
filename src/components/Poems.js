@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+import BottomNavbar from './BottomNavbar';
+
 import { AppContext } from '../context/AppContext';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -170,7 +172,9 @@ const Poems = () => {
                         <p>{renderContentWithLineBreaks(poem)}</p>
                         <footer className="blockquote-footer">
                           <cite>
-                            <strong>{poem.author}</strong>
+                            <Link to={`/profile/${poem.userId}`}>
+                              <strong style={{ color: "#6c757d" }}>{poem.author}</strong>
+                            </Link>
                             <p>{poem.creationDate.split("T")[0]}</p>
                           </cite>
                         </footer>
@@ -273,6 +277,7 @@ const Poems = () => {
               ))}
             </ul>
           </div>
+          <BottomNavbar />
         </>
       ) : (
         <>
