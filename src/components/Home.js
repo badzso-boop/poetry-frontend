@@ -12,7 +12,23 @@ function Home() {
             </div>
             <div className="card-body">
                 <p className="card-text">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptates ut, omnis tempora possimus accusamus aliquid nesciunt perspiciatis officia eius aliquam impedit quam hic error. Nemo maiores obcaecati odio quas ullam.
+                    Ez az oldal azért jött létre, hogy összegyűjtsem a saját verseimet, de gondoltam miért csak a saját verseim jelenjenek meg? Mi lenne, ha mások is meg tudnák osztani a verseiket a nagyvilággal. Ezért is jött létre ez az oldal.
+                </p>
+                <p className='card-text'>
+                    Regisztráció után már lehet is verseket feltölteni, illetve azokat albumokba gyűjteni. Ezeket a Profilom menüpont alatt lehet menedzselni, illetve szerkeszteni is.
+                </p>
+
+                <h5>Ez az oldal fejlesztés alatt áll, lehetnek benne hibák illetve fognak még bővülni új funkciókkal is</h5>
+
+                <br />
+
+                <h2>Tervezett újítások</h2>
+                <ul>
+                    <li>Verseket szétválogatom követett alkotók közt és felfedezés közt</li>
+                </ul>
+
+                <p className='card-text'>
+                    Ha hibát észlelsz a lentebb található közösségi felületeken elérsz! :)
                 </p>
             </div>
             <div className='card-footer'>
