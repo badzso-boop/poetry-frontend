@@ -12,7 +12,7 @@ import { faHeart, faComment, faTrashAlt } from '@fortawesome/free-regular-svg-ic
 import BadgeAlert from './BadgeAlert';
 
 const Poems = () => {
-  const { poems, userId, setPoems, user, setCommentUpload } = useContext(AppContext);
+  const { poems, userId, setPoems, user, setCommentUpload, labels } = useContext(AppContext);
   const [showcomment, setShowComment] = useState(false);
   const [selectedPoemIndex, setSelectedPoemIndex] = useState(null);
   const [likeCount, setLikeCount] = useState({});
@@ -40,8 +40,19 @@ const Poems = () => {
   }, [poems, fakeLike]);
 
   const handleToggleComments = (index) => {
-    setShowComment(!showcomment);
-    setSelectedPoemIndex(index);
+    if (userId > 0) {
+      setShowComment(!showcomment);
+      setSelectedPoemIndex(index);
+    }
+    else {
+      setFakeLike(false)
+      setFakeLikeText("Lépj be vagy regisztrálj, ahhoz hogy kommentelni tudj!")
+
+      setTimeout(() => {
+        setFakeLike(null);
+        setFakeLikeText("");
+      }, 2000);
+    }
   };
 
   const handleLike = async (poemId) => {
@@ -90,7 +101,7 @@ const Poems = () => {
 
   const handleLikeFake = () => {
     setFakeLike(false)
-    setFakeLikeText("Lépj be ahhoz hogy likeolni tudj!")
+    setFakeLikeText("Lépj be vagy regisztrálj, ahhoz hogy likeolni tudj!")
 
     setTimeout(() => {
       setFakeLike(null);
@@ -152,6 +163,11 @@ const Poems = () => {
     }
   }
 
+  const getLabelNameById = (labelId) => {
+    const foundLabel = labels.find(label => label.label_id === labelId);
+    return foundLabel ? foundLabel.label_name : null;
+  };
+
   return (
     <>
       {poems && poems.length > 0 ? (
@@ -159,125 +175,149 @@ const Poems = () => {
           <div>
             <h1 className="text-center">Versek</h1>
             <ul className="list-unstyled">
-              {poems.map((poem, index) => (
-                <li key={index}>
-                  <div className="card m-4">
-                    <div className="card-header">
-                      <Link to={`/poems/${index}`}>
-                        <strong>{poem.title}</strong>
-                      </Link>
-                    </div>
-                    <div className="card-body">
-                      <blockquote>
-                        <p>{renderContentWithLineBreaks(poem)}</p>
-                        <footer className="blockquote-footer">
-                          <cite>
-                            <Link to={`/profile/${poem.userId}`}>
-                              <strong style={{ color: "#6c757d" }}>{poem.author}</strong>
-                            </Link>
-                            <p>{poem.creationDate.split("T")[0]}</p>
-                          </cite>
-                        </footer>
-                      </blockquote>
+              {poems.map((poem, index) => (  
+                <div key={index}>
+                  {poem.visible === 1 ? (
+                    <li key={index}>
+                      <div className="card m-4">
+                        <div className="card-header">
+                          <Link to={`/poems/${index}`}>
+                            <strong>{poem.title}</strong>
+                          </Link>
+                        </div>
+                        <div className="card-body">
+                          <blockquote>
+                            <p>{renderContentWithLineBreaks(poem)}</p>
+                            <footer className="blockquote-footer">
+                              <cite>
+                                <Link to={`/profile/${poem.userId}`}>
+                                  <strong style={{ color: "#6c757d" }}>{poem.author}</strong>
+                                </Link>
+                                <p>{poem.creationDate.split("T")[0]}</p>
+                              </cite>
+                            </footer>
+                          </blockquote>
 
-                      {userId>0?(
-                        <button className='btn btn-primary m-2 btn-sm' onClick={() => handleLike(poem.id)}>
-                          <FontAwesomeIcon icon={faHeart} /> {likeCount[poem.id] || 0}
-                        </button>
-                      ):(
-                        <button className='btn btn-primary m-2 btn-sm' onClick={handleLikeFake}>
-                          <FontAwesomeIcon icon={faHeart} /> {likeCount[poem.id] || 0}
-                        </button>
-                      )}
+                          {poem.labels !== null ? (
+                            <div>
+                              <h4>Labelek</h4>
+                              <div className="mb-2">
+                                {poem.labels !== null &&
+                                  poem.labels.split('-').map((labelId, index) => (
+                                    <span key={index} className="badge text-bg-info me-1">
+                                      {getLabelNameById(parseInt(labelId))}
+                                    </span>
+                                  ))}
+                              </div>
+                            </div>
+                          ) : (<></>)}
 
-                      {fakeLike !== null && (
-                        <BadgeAlert
-                          success={fakeLike}
-                          text={fakeLikeText}
-                        />
-                      )}
 
-                      <>
-                        <button
-                          className="btn btn-primary btn-sm ms-2"
-                          onClick={() => handleToggleComments(index)}
-                        >
-                          <FontAwesomeIcon icon={faComment} /> {poem.comments.length}
-                        </button>
-                        {selectedPoemIndex === index && showcomment ? (
-                            <ul className="list-unstyled list-group-flush mb-4" style={{ height: '350px', overflowY: 'scroll' }}>
-                              {userId > 0 ? (
-                                <>
-                                  <li className="list-group-item">
-                                    <div className="card mb-2">
-                                      <div className="card-header d-flex justify-content-between">
-                                        <p className="text-left mb-0">{user.username}</p>
-                                        <p className="text-right mb-0">{formattedDate}</p>
-                                      </div>
-                                      <div className="card-body">
-                                        <div className="card-text">
-                                          <form onSubmit={(e) => {e.preventDefault();handleCommentSubmit(poem.id);}}>
-                                            <div className="form-group mb-4">
-                                              <label htmlFor="commentText">Komment:</label>
-                                              <textarea
-                                                className="form-control"
-                                                id="commentText"
-                                                rows="3"
-                                                value={commentText}
-                                                onChange={(e) => setCommentText(e.target.value)}
-                                              />
+                          {/* kommentek */}
+                          {poem.comment === 1 ? (
+                            <>
+                              <button
+                                className="btn btn-primary btn-sm ms-2"
+                                onClick={() => handleToggleComments(index)}
+                              >
+                                <FontAwesomeIcon icon={faComment} /> {poem.comments.length}
+                              </button>
+                              {selectedPoemIndex === index && showcomment ? (
+                                  <ul className="list-unstyled list-group-flush mb-4" style={{ height: '350px', overflowY: 'scroll' }}>
+                                    {userId > 0 ? (
+                                      <>
+                                        <li className="list-group-item">
+                                          <div className="card mb-2">
+                                            <div className="card-header d-flex justify-content-between">
+                                              <p className="text-left mb-0">{user.username}</p>
+                                              <p className="text-right mb-0">{formattedDate}</p>
                                             </div>
-                                            <button type="submit" className="btn btn-primary">Küldés</button>
-                                          </form>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </li>
-                                </>
-                              ) : (
-                                null
-                              )}
+                                            <div className="card-body">
+                                              <div className="card-text">
+                                                <form onSubmit={(e) => {e.preventDefault();handleCommentSubmit(poem.id);}}>
+                                                  <div className="form-group mb-4">
+                                                    <label htmlFor="commentText">Komment:</label>
+                                                    <textarea
+                                                      className="form-control"
+                                                      id="commentText"
+                                                      rows="3"
+                                                      value={commentText}
+                                                      onChange={(e) => setCommentText(e.target.value)}
+                                                    />
+                                                  </div>
+                                                  <button type="submit" className="btn btn-primary">Küldés</button>
+                                                </form>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </li>
+                                      </>
+                                    ) : (
+                                      null
+                                    )}
 
 
-                              {poem.comments.map((comment, index) => (
-                                <li
-                                  key={index}
-                                  className="list-group-item"
-                                  data-commentid={comment.id}
-                                >
-                                  <div className="card mb-2">
-                                    <div className="card-header d-flex justify-content-between">
-                                      <p className="text-left mb-0">{comment.commenter}</p>
-                                      <p className="text-right mb-0">{comment.dateCommented.split("T")[0]}</p>
-                                    </div>
-                                    <div className="card-body">
-                                      <div className='row'>
-                                        <div className='col-9'>
-                                          <p className="card-text komment">
-                                            {comment.commentText}
-                                          </p>
+                                    {poem.comments.map((comment, index) => (
+                                      <li
+                                        key={index}
+                                        className="list-group-item"
+                                        data-commentid={comment.id}
+                                      >
+                                        <div className="card mb-2">
+                                          <div className="card-header d-flex justify-content-between">
+                                            <p className="text-left mb-0">{comment.commenter}</p>
+                                            <p className="text-right mb-0">{comment.dateCommented.split("T")[0]}</p>
+                                          </div>
+                                          <div className="card-body">
+                                            <div className='row'>
+                                              <div className='col-9'>
+                                                <p className="card-text komment">
+                                                  {comment.commentText}
+                                                </p>
+                                              </div>
+                                              <div className='col-3'>
+                                                {user && user.username === comment.commenter ? (<button className="text-right mb-0 btn btn-danger" onClick={(e) => {e.preventDefault();handleCommentDelete(comment.id);}}><FontAwesomeIcon icon={faTrashAlt} /></button>) : (<></>)}
+                                              </div>
+                                            </div>
+                                          </div>
                                         </div>
-                                        <div className='col-3'>
-                                          {user && user.username === comment.commenter ? (<button className="text-right mb-0 btn btn-danger" onClick={(e) => {e.preventDefault();handleCommentDelete(comment.id);}}><FontAwesomeIcon icon={faTrashAlt} /></button>) : (<></>)}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            null
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  null
+                                )}
+                            </>
+                          ) : (<></>)}
+
+
+                          {userId>0?(
+                            <button className='btn btn-primary m-2 btn-sm' onClick={() => handleLike(poem.id)}>
+                              <FontAwesomeIcon icon={faHeart} /> {likeCount[poem.id] || 0}
+                            </button>
+                          ):(
+                            <button className='btn btn-primary m-2 btn-sm' onClick={handleLikeFake}>
+                              <FontAwesomeIcon icon={faHeart} /> {likeCount[poem.id] || 0}
+                            </button>
                           )}
-                      </>
-                      
-                    </div>
-                  </div>
-                </li>
+
+                          {fakeLike !== null && (
+                            <BadgeAlert
+                              success={fakeLike}
+                              text={fakeLikeText}
+                            />
+                          )}
+                          
+                        </div>
+                      </div>
+                    </li>
+                  ) : (<></>)}
+                  
+                </div>
               ))}
             </ul>
           </div>
-          <BottomNavbar />
+          {/* <BottomNavbar /> */}
         </>
       ) : (
         <>

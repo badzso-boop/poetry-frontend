@@ -25,6 +25,13 @@ function Home() {
                 <h2>Tervezett újítások</h2>
                 <ul>
                     <li>Verseket szétválogatom követett alkotók közt és felfedezés közt</li>
+                    <li>Tul sok a szoveg egyszerre, inkabb csak 4-8 sor megjelenitese majd egy gombbal tovabblepes</li>
+                    <li>keresomotor -> minden versnek es albumnak lesznek labeljei es ezekre majd lehet szurni/keresni</li>
+                    <li>albumoknal csak a versek cime jelenik meg es azokra kattintva lehet elolvasni + vegigolvasas funkcio</li>
+                    <li>verseknek lathatosag</li>
+                    <li>verseknek labelek</li>
+                    <li>profilba bio</li>
+                    <li>kikapcsolhatoak a kommentek a verseknel</li>
                 </ul>
 
                 <p className='card-text'>

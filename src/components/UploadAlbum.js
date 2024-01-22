@@ -19,28 +19,28 @@ const UploadAlbum = () => {
 
   const { user, userId, setAlbumUpload } = useContext(AppContext);
   
-  useEffect(() => {
-    const fetchPoems = async () => {
-      try {
-        const apiUrl = process.env.REACT_APP_API_URL;
+  const fetchPoems = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
 
-        // Elkérjük a user ID-t a session-ből
-        const userid = userId;
+      // Elkérjük a user ID-t a session-ből
+      const userid = userId;
 
-        // Ha nincs bejelentkezve a felhasználó, ne küldjük el a kérést
-        if (!user || !user.username) {
-          setError('Not logged in');
-          return;
-        }
-
-        const response = await axios.get(apiUrl+`/poems/user/${userid}`, { withCredentials: true });
-        setPoems(response.data);
-      } catch (error) {
-        console.error('Error fetching poems:', error.message);
-        setError('Nincsenek még feltöltve verseid!');
+      // Ha nincs bejelentkezve a felhasználó, ne küldjük el a kérést
+      if (!user || !user.username) {
+        setError('Not logged in');
+        return;
       }
-    };
 
+      const response = await axios.get(apiUrl+`/poems/user/${userid}`, { withCredentials: true });
+      setPoems(response.data);
+    } catch (error) {
+      console.error('Error fetching poems:', error.message);
+      setError('Nincsenek még feltöltve verseid!');
+    }
+  };
+
+  useEffect(() => {
     fetchPoems();
   }, [user, userId, poemIds]);
 

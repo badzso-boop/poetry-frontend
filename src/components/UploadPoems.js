@@ -8,9 +8,10 @@ import BadgeAlert from './BadgeAlert';
 const UploadPoems = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const { user, setPoemUpload } = useContext(AppContext);
+  const { user, setPoemUpload, labels } = useContext(AppContext);
   const [uploadPoemSucces, setUploadPoemSucces] = useState(null)
   const [uploadPoemText, setUploadPoemText] = useState("")
+  const [isLabelWithInternallyDisabledControl, setIsLabelWithInternallyDisabledControl] = useState([]);
 
   const handleTextareaChange = (e) => {
     // Szűrjük az Enter gombot, és adjunk hozzá egy sortörést a tartalomhoz
@@ -35,7 +36,8 @@ const UploadPoems = () => {
       const requestBody = {
         title: title,
         content: content,
-        userId: user.userId, // A session-ben tárolt user_id
+        userId: user.userId,
+        labels: isLabelWithInternallyDisabledControl.join('-'),
       };
 
       const response = await fetch(apiUrl+'/poems', {
@@ -67,6 +69,22 @@ const UploadPoems = () => {
     }
   };
 
+  const handleCheckboxChange = (labelId) => {
+    // Itt kezelheted a checkbox változását
+    // console.log(`Checkbox changed for label with id: ${labelId}`);
+
+    // Példa: hozzáadhatod a címke id-ját a kiválasztott isLabelWithInternallyDisabledControl-hoz
+    setIsLabelWithInternallyDisabledControl((prevIds) => {
+      if (prevIds.includes(labelId)) {
+        // Ha már benne van, távolítsd el
+        return prevIds.filter((id) => id !== labelId);
+      } else {
+        // Ha nincs benne, add hozzá
+        return [...prevIds, labelId];
+      }
+    });
+  };
+
   return (
     <div>
       <h2>Vers feltöltése</h2>
@@ -94,6 +112,23 @@ const UploadPoems = () => {
             className="form-control"
             required
           />
+        </div>
+        <div>
+          <p>Labelek</p>
+            <ul>
+              {labels.length > 0 && labels.map((label, index) => (
+                <li key={index}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value={label.label_id}
+                      onChange={() => handleCheckboxChange(label.label_id)}
+                      checked={isLabelWithInternallyDisabledControl.includes(label.label_id)} 
+                    /> {label.label_name}
+                  </label>
+                </li>
+              ))}
+            </ul>
         </div>
         <button type="submit" className="btn btn-primary">
           Mentés

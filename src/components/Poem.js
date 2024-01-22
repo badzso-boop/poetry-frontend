@@ -13,7 +13,7 @@ import { faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 
 const Poem = (() => {
     const { poemId } = useParams();
-    const { poems, user, userId, setCommentUpload, setPoems } = useContext(AppContext);
+    const { poems, user, userId, setCommentUpload, setPoems, labels } = useContext(AppContext);
     const [showcomment, setShowComment] = useState(false);
     const [selectedPoemIndex, setSelectedPoemIndex] = useState(null); // Új állapot
     const [commentText, setCommentText] = useState('');
@@ -35,6 +35,16 @@ const Poem = (() => {
       setShowComment(!showcomment);
       setSelectedPoemIndex(index);
     };
+
+    const handleFakeComment = () => {
+      setFakeLike(false)
+      setFakeLikeText("Lépj be ahhoz hogy kommentelni tudj!")
+  
+      setTimeout(() => {
+        setFakeLike(null);
+        setFakeLikeText("");
+      }, 2000);
+    }
 
     const handleCommentDelete = async (commentId) => {
       try {
@@ -147,7 +157,11 @@ const Poem = (() => {
       }, 2000);
     } 
 
-    
+    const getLabelNameById = (labelId) => {
+      const foundLabel = labels.find(label => label.label_id === labelId);
+      return foundLabel ? foundLabel.label_name : null;
+    };
+
 
     return (
       <>
@@ -176,7 +190,33 @@ const Poem = (() => {
                             </footer>
                           </blockquote>
 
-                          <span><strong>Kommentek:</strong> {poem.comments.length === 0 ? (<span>0 db</span>) : (<></>)} </span>
+                          {/* labelek */}
+                          {poem.labels !== null ? (
+                            <div>
+                              <h4>Labelek</h4>
+                              <div className="mb-2">
+                                {poem.labels !== null &&
+                                  poem.labels.split('-').map((labelId, index) => (
+                                    <span key={index} className="badge text-bg-info me-1">
+                                      {getLabelNameById(parseInt(labelId))}
+                                    </span>
+                                  ))}
+                              </div>
+                            </div>
+                          ) : (<></>)}
+
+
+
+                          {/* kommentek */}
+                          {userId>0?(
+                            <button className="btn btn-primary btn-sm ms-2">
+                              <FontAwesomeIcon icon={faComment} /> {poem.comments.length}
+                            </button>
+                          ):(
+                            <button className="btn btn-primary btn-sm ms-2" onClick={handleFakeComment}>
+                              <FontAwesomeIcon icon={faComment} /> {poem.comments.length}
+                            </button>
+                          )}
 
                           {userId>0?(
                             <button className='btn btn-primary m-2 btn-sm' onClick={() => handleLike(poem.id)}>
@@ -229,7 +269,6 @@ const Poem = (() => {
 
                               </>
                             )}
-
 
                             {poem.comments.map((comment, index) => (
                               <li
