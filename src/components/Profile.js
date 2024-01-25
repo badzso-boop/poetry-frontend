@@ -5,7 +5,8 @@ import axios from "axios";
 import { AppContext } from '../context/AppContext';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
+import { faTrashAlt, faHeart, faComment, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import { faCommentSlash } from '@fortawesome/free-solid-svg-icons';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 
 const Profile = () => {
@@ -17,7 +18,7 @@ const Profile = () => {
   const [followers, setFollowers] = useState([])
   const [following, setFollowing] = useState([])
 
-  const { user, userId, setUser } = useContext(AppContext);
+  const { user, userId, setUser, setPoemUpload, PoemUpload } = useContext(AppContext);
 
   const fetchFollowers = async () => {
     try {
@@ -85,6 +86,7 @@ const Profile = () => {
 
       // Sikeres módosítás esetén további műveletek, pl. frissítés vagy visszajelzés
       console.log(`A költemény (${poemId}) sikeresen módosítva!`);
+      setPoemUpload(poemId)
 
       // Frissítjük a state-et és leállítjuk a szerkesztés módot
       setEditingState((prevEditingState) => ({
@@ -265,6 +267,54 @@ const Profile = () => {
     setEditingState(false)
   }
 
+  const handleVisibleClick = async (poemId, poem) => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+  
+      // Invert the value of poem.visible
+      poem.visible = poem.visible === 1 ? 0 : 1;
+  
+      // Az editedPoem állapotot használhatod a frissített adatok elküldéséhez
+      await axios.put(apiUrl+`/poems/${poemId}`, {visible: poem.visible}, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      // Sikeres módosítás esetén további műveletek, pl. frissítés vagy visszajelzés
+      console.log(`A költemény (${poemId}) sikeresen módosítva!`);
+      setPoemUpload(Math.floor(Math.random() * 1001))
+    } catch (error) {
+      // Hiba esetén kezelés, pl. hibaüzenet megjelenítése
+      console.error("Hiba történt a módosítás során:", error);
+    }
+  };
+
+  const handleCommentVisibleClick = async (poemId, poem) => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+  
+      // Invert the value of poem.visible
+      poem.comment = poem.comment === 1 ? 0 : 1;
+  
+      // Az editedPoem állapotot használhatod a frissített adatok elküldéséhez
+      await axios.put(apiUrl+`/poems/${poemId}`, {comment: poem.comment}, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      // Sikeres módosítás esetén további műveletek, pl. frissítés vagy visszajelzés
+      console.log(`A költemény (${poemId}) sikeresen módosítva!`);
+      setPoemUpload(Math.floor(Math.random() * 1001))
+    } catch (error) {
+      // Hiba esetén kezelés, pl. hibaüzenet megjelenítése
+      console.error("Hiba történt a módosítás során:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -290,13 +340,12 @@ const Profile = () => {
     fetchUser();
     fetchFollowers();
     fetchFollowing();
-  }, [poemId, editingState, commentId, editingStateComment, albumDelete]);
+  }, [poemId, editingState, commentId, editingStateComment, albumDelete, PoemUpload]);
 
   return (
     user && (
       <div>
         {/* <!-- Felhasználói adatok --> */}
-
         <div className="col-12 mb-4">
           <div className="card">
             <div className="card-header">
@@ -337,7 +386,7 @@ const Profile = () => {
                       >
                         <div className="card">
                           <div className="card-header">
-                            <strong>{poem.title}</strong>
+                            <strong>{poem.title} - {poem.visible===1?(<span>Látható</span>):(<span>Rejtett</span>)} - {poem.comment===1?(<span>Kommentek</span>):(<span>No Kommentek</span>)}</strong>
                           </div>
                           <div className="card-body">
                             <blockquote>
@@ -401,9 +450,29 @@ const Profile = () => {
                                       </form>
                                     </div>
                                     <div className="col-6 d-flex align-items-center justify-content-center">
-                                      <button className="btn btn-primary" onClick={() => handleEditClick(poem.id, poem)}>
+                                      <button className="btn btn-primary m-1" onClick={() => handleEditClick(poem.id, poem)}>
                                         <FontAwesomeIcon icon={faPen} />
                                       </button>
+                                      {/* Vosoble */}
+                                      {poem.visible===1? (
+                                        <button className="btn btn-danger m-1" onClick={() => handleVisibleClick(poem.id, poem)}>
+                                          <FontAwesomeIcon icon={faEyeSlash} />
+                                        </button>
+                                      ) : (
+                                        <button className="btn btn-primary m-1" onClick={() => handleVisibleClick(poem.id, poem)}>
+                                          <FontAwesomeIcon icon={faEye} />
+                                        </button>
+                                      )}
+                                      {/* Kommentek kikapcsolasa */}
+                                      {poem.comment===1? (
+                                        <button className="btn btn-danger m-1" onClick={() => handleCommentVisibleClick(poem.id, poem)}>
+                                          <FontAwesomeIcon icon={faCommentSlash} />
+                                        </button>
+                                      ) : (
+                                        <button className="btn btn-primary m-1" onClick={() => handleCommentVisibleClick(poem.id, poem)}>
+                                          <FontAwesomeIcon icon={faComment} />
+                                        </button>
+                                      )}
                                     </div>
                                   </>
                               )}
@@ -439,25 +508,12 @@ const Profile = () => {
                                           </p>
                                         </div>
                                         <div className="col-3">
-                                          <button
-                                              className="btn btn-danger m-1"
-                                              onClick={() =>
-                                                handleDeleteClickComment(comment.id)
-                                              }
-                                            >
+                                            <button className="btn btn-danger m-1" onClick={() => handleDeleteClickComment(comment.id)}>
                                               <FontAwesomeIcon icon={faTrashAlt} />
                                             </button>
                                         </div>
                                         <div className="col-3">
-                                          <button
-                                            className="btn btn-primary m-1"
-                                            onClick={() =>
-                                              handleEditClickComment(
-                                                comment.id,
-                                                comment
-                                              )
-                                            }
-                                          >
+                                          <button className="btn btn-primary m-1" onClick={() => handleEditClickComment(comment.id,comment)}>
                                             <FontAwesomeIcon icon={faPen} />
                                           </button>
                                         </div>
