@@ -25,9 +25,7 @@ function Home() {
                 <h2>Tervezett újítások</h2>
                 <ul>
                     <li>Verseket szétválogatom követett alkotók közt és felfedezés közt</li>
-                    <li>Tul sok a szoveg egyszerre, inkabb csak 4-8 sor megjelenitese majd egy gombbal tovabblepes</li>
                     <li>keresomotor - minden versnek es albumnak lesznek labeljei es ezekre majd lehet szurni/keresni</li>
-                    <li>albumoknal csak a versek cime jelenik meg es azokra kattintva lehet elolvasni + vegigolvasas funkcio</li>
                     <li>profilba bio</li>
                 </ul>
 
@@ -36,6 +34,8 @@ function Home() {
                     <li>verseknek labelek</li>
                     <li>verseknek lathatosag</li>
                     <li>kikapcsolhatoak a kommentek a verseknel</li>
+                    <li>Tul sok a szoveg egyszerre, inkabb csak 4-8 sor megjelenitese majd egy gombbal tovabblepes</li>
+                    <li>albumoknal csak a versek cime jelenik meg es azokra kattintva lehet elolvasni + vegigolvasas funkcio</li>
                 </ul>
 
                 <p className='card-text'>

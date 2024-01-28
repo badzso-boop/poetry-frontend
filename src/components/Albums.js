@@ -56,13 +56,15 @@ const Albums = () => {
                   <p className="card-text">{album.description}</p>
                 </div>
                 <ul className="list-unstyled">
-                  {album.poems.map((poem, index) => (
-                    <li key={index} className="m-3">
+                  {album.poems.map((poem, index2) => (
+                    <li key={index2} className="m-3">
                       <div className="card">
                         <div className="card-header">
-                          <strong>{poem.title}</strong>
+                          <Link to={`/poems/-${index}.${index2}`}>
+                            <strong>{poem.title}</strong>
+                          </Link>
                         </div>
-                        <div className="card-body">
+                        {/* <div className="card-body">
                           <blockquote>
                             <p>{renderContentWithLineBreaks(poem)}</p>
                             <footer className="blockquote-footer">
@@ -72,7 +74,7 @@ const Albums = () => {
                               </cite>
                             </footer>
                           </blockquote>
-                        </div>
+                        </div> */}
                       </div>
                     </li>
                   ))}

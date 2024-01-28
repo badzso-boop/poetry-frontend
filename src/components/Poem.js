@@ -13,7 +13,7 @@ import { faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 
 const Poem = (() => {
     const { poemId } = useParams();
-    const { poems, user, userId, setCommentUpload, setPoems, labels } = useContext(AppContext);
+    const { albums, poems, user, userId, setCommentUpload, setPoems, labels } = useContext(AppContext);
     const [showcomment, setShowComment] = useState(false);
     const [selectedPoemIndex, setSelectedPoemIndex] = useState(null); // Új állapot
     const [commentText, setCommentText] = useState('');
@@ -21,8 +21,27 @@ const Poem = (() => {
     const [likeCount, setLikeCount] = useState({});
     const [fakeLike, setFakeLike] = useState(null)
     const [fakeLikeText, setFakeLikeText] = useState("")
+    const [poem, setPoem] = useState(null);
 
-    const poem = poems[poemId]
+    useEffect(() => {
+      const fetchData = async () => {
+        if (String(poemId)[0] === "-") {
+          const adat = poemId.substring(1);
+          const albumIndex = adat.split(".")[0];
+          const poemIndex = adat.split(".")[1];
+    
+          if (albums[albumIndex] !== undefined && albums[albumIndex].poems[poemIndex] !== undefined) {
+            const seged = albums[albumIndex];
+            setPoem(seged.poems[poemIndex]);
+          }
+        } else {
+          setPoem(poems[poemId]);
+        }
+      };
+    
+      fetchData();
+    }, [poemId, albums, poems]);
+
 
     const today = new Date();
     const year = today.getFullYear();
@@ -100,6 +119,7 @@ const Poem = (() => {
       return contentWithBreaks;
     };
 
+    
     useEffect(() => {
     }, [commented]);
 
@@ -168,11 +188,20 @@ const Poem = (() => {
         {poem && poems.length > 0 ? (
             <>
               <div>
-                <Nav.Link as={Link} to="/poems">
-                  <button class="btn btn-primary">
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                  </button>
-                </Nav.Link>
+                {poemId[0] === "-"? (
+                  <Nav.Link as={Link} to="/albums">
+                    <button className="btn btn-primary">
+                      <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                  </Nav.Link>
+                ):(
+                  <Nav.Link as={Link} to="/poems">
+                    <button className="btn btn-primary">
+                      <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                  </Nav.Link>
+                )}
+                
                 <ul className="list-unstyled">
                     <li>
                       <div className="card m-4">

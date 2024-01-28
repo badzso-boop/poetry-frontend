@@ -1,6 +1,11 @@
 import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
+import { Link } from 'react-router-dom';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 
 const Poem = (() => {
     const { albumId } = useParams();
@@ -26,6 +31,11 @@ const Poem = (() => {
         {albums && albums.length > 0 ? 
         (
             <>
+                <Nav.Link as={Link} to="/albums">
+                    <button className="btn btn-primary">
+                      <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                </Nav.Link>
                 <ul className="list-unstyled">
                     <li>
                         <div className="card m-4">

@@ -107,20 +107,29 @@ const Poems = () => {
       setFakeLike(null);
       setFakeLikeText("");
     }, 2000);
-  }  
+  } 
 
-  const renderContentWithLineBreaks = (poem) => {
+  const renderContentWithLineBreaks = (poem, index) => {
     if (!poem) return null;
 
-    const contentWithBreaks = poem.content.split('\n').map((line, index) => (
+    const lines = poem.content.split('\n');
+    const contentWithBreaks = lines.slice(0, 4).map((line, index) => (
       <React.Fragment key={index}>
         {line}
         <br />
       </React.Fragment>
     ));
 
+    if (lines.length > 4) {
+      contentWithBreaks.push(
+        <Link to={`/poems/${index}`}>
+          Olvasd tovább
+        </Link>
+      );
+    }
     return contentWithBreaks;
   };
+
 
   const handleCommentSubmit = async (poemId) => {
     try {
@@ -187,7 +196,7 @@ const Poems = () => {
                         </div>
                         <div className="card-body">
                           <blockquote>
-                            <p>{renderContentWithLineBreaks(poem)}</p>
+                            <p>{renderContentWithLineBreaks(poem, index)}</p>
                             <footer className="blockquote-footer">
                               <cite>
                                 <Link to={`/profile/${poem.userId}`}>
