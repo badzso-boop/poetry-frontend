@@ -114,7 +114,7 @@ const UploadPoems = () => {
           />
         </div>
         <div>
-          <p>Labelek</p>
+          <p>Címkék</p>
             <ul>
               {labels.length > 0 && labels.map((label, index) => (
                 <li key={index}>
@@ -130,7 +130,7 @@ const UploadPoems = () => {
               ))}
             </ul>
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary mt-2">
           Mentés
         </button>
       </form>

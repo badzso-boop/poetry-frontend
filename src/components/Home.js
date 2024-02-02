@@ -12,7 +12,7 @@ function Home() {
             </div>
             <div className="card-body">
                 <p className="card-text">
-                    Ez az oldal azért jött létre, hogy összegyűjtsem a saját verseimet, de gondoltam miért csak a saját verseim jelenjenek meg? Mi lenne, ha mások is meg tudnák osztani a verseiket a nagyvilággal. Ezért is jött létre ez az oldal.
+                    Ez az oldal azért jött létre, hogy összegyűjtsem a saját verseimet, és úgy gondoltam miért csak a saját verseim jelenjenek meg? Mi lenne, ha mások is meg tudnák osztani a verseiket a nagyvilággal. Ezért is jött létre ez az oldal.
                 </p>
                 <p className='card-text'>
                     Regisztráció után már lehet is verseket feltölteni, illetve azokat albumokba gyűjteni. Ezeket a Profilom menüpont alatt lehet menedzselni, illetve szerkeszteni is.
@@ -26,7 +26,6 @@ function Home() {
                 <ul>
                     <li>Verseket szétválogatom követett alkotók közt és felfedezés közt</li>
                     <li>keresomotor - minden versnek es albumnak lesznek labeljei es ezekre majd lehet szurni/keresni</li>
-                    <li>profilba bio</li>
                 </ul>
 
                 <h2>Elvégzett újítások</h2>
@@ -36,6 +35,7 @@ function Home() {
                     <li>kikapcsolhatoak a kommentek a verseknel</li>
                     <li>Tul sok a szoveg egyszerre, inkabb csak 4-8 sor megjelenitese majd egy gombbal tovabblepes</li>
                     <li>albumoknal csak a versek cime jelenik meg es azokra kattintva lehet elolvasni + vegigolvasas funkcio</li>
+                    <li>profilba bio</li>
                 </ul>
 
                 <p className='card-text'>

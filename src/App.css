@@ -47,3 +47,61 @@
   word-wrap: break-word; /* Szó-törés engedélyezése a szóközökön is */
   white-space: pre-line; /* Minden sorvégi szóközt és tabulátort elhagy, egyéb szóközöket megtart */
 }
+
+/* Main color:  #0a4f5c*/
+/* Secondary color: #75dcf0*/
+/* Third color:  #e71891*/
+
+.barna {
+  background-color: #0a4f5c !important;
+}
+
+.card-header {
+  background-color: #75dcf0 !important;
+}
+
+.badge {
+  background-color: #e71891;
+}
+
+.btn-primary {
+  background-color: #0a4f5c !important;
+  border-color: #0a4f5c !important;
+}
+
+.btn-info {
+  background-color: #e71891 !important;
+  border-color: #e71891 !important;
+  color: black !important;
+}
+
+.card {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.big {
+  width: 100%;
+}
+
+.nagy {
+  width: 45%;
+}
+
+.kicsi {
+  width: 10%;
+}
+
+.card-container {
+  padding: 0;
+}
+
+.card-animated {
+  transform: translateX(-100%); /* Kezdetben az elemek balra vannak csúsztatva, így nem látszanak */
+  animation: slideIn 1s ease-out forwards; /* Animáció hozzáadása a kártyákhoz */
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateX(0); /* Animáció végén az elemek a kezdeti pozíciójukba csúsznak */
+  }
+}

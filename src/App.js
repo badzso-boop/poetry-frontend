@@ -17,6 +17,7 @@ import Home from './components/Home';
 
 import UploadPoems from './components/UploadPoems';
 import UploadAlbum from './components/UploadAlbum';
+import Autocomplete from './components/AutoComplete';
 
 
 import { AppProvider } from './context/AppContext';
@@ -43,6 +44,7 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/uploadpoem" element={<UploadPoems />} />
                   <Route path="/uploadalbum" element={<UploadAlbum />} />
+                  <Route path="/auto" element={<Autocomplete words={["Alom", "Boldogsag", "Egyedulallo", "Ido", "Szerelem"]}/>} />
                 </Routes>
               </div>
             </div>

@@ -89,7 +89,7 @@ const Register = () => {
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary mt-2">
           Register
         </button>
       </form>

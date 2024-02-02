@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Nav} from 'react-bootstrap';
 import axios from "axios";
 import { AppContext } from '../context/AppContext';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
-import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faUserPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const SpecificProfile = () => {
   const { inUserId } = useParams();
@@ -108,6 +110,11 @@ const SpecificProfile = () => {
     <>
     {user !== null && (
       <div>
+        <Nav.Link as={Link} to="/poems" className="mb-4">
+          <button className="btn btn-primary">
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </button>
+        </Nav.Link>
         {/* <!-- Felhasználói adatok --> */}        
           <div className="col-12 mb-4">
             <div className="card">

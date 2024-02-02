@@ -147,7 +147,7 @@ const UploadAlbum = () => {
                 ))}
             </ul>
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary mt-2">
           Mentés
         </button>
       </form>

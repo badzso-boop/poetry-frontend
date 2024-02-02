@@ -5,7 +5,7 @@ import axios from "axios";
 import { AppContext } from '../context/AppContext';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faHeart, faComment, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import { faTrashAlt, faHeart, faComment, faEye, faEyeSlash, faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
 import { faCommentSlash } from '@fortawesome/free-solid-svg-icons';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 
@@ -17,6 +17,8 @@ const Profile = () => {
   const [albumDelete, setAlbumDelete] = useState(-1)
   const [followers, setFollowers] = useState([])
   const [following, setFollowing] = useState([])
+  const [editing, setEditing] = useState(false);
+  const [editedBio, setEditedBio] = useState();
 
   const { user, userId, setUser, setPoemUpload, PoemUpload } = useContext(AppContext);
 
@@ -315,6 +317,38 @@ const Profile = () => {
     }
   };
 
+  const editBio = () => {
+    setEditing(true)
+  };
+
+  const handleSaveClick = async () => {
+    // Elküldjük a szerkesztett biót a szervernek
+    await sendEditBio(user.id, editedBio);
+
+    // Visszaállítjuk a szerkesztési állapotokat
+    setEditing(false);
+  };
+
+  const sendEditBio = async (UserId, bio) => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      const requestBody = {
+        bio: bio
+      };
+
+      // Axios POST kérés
+      const response = await axios.put(apiUrl+"/users/" + UserId, requestBody, {
+        withCredentials: true  // withCredentials beállítása true-ra
+      });
+
+      // A kérés eredményének logolása
+      console.log('Sikeres POST kérés:', response.data);
+    } catch (error) {
+      console.error('Hiba a POST kérés során:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -332,6 +366,7 @@ const Profile = () => {
           { withCredentials: true }
         );
         setUser(response.data);
+        setEditedBio(response.data.bio)
       } catch (error) {
         console.error("Error fetching poems:", error.message);
       }
@@ -340,7 +375,7 @@ const Profile = () => {
     fetchUser();
     fetchFollowers();
     fetchFollowing();
-  }, [poemId, editingState, commentId, editingStateComment, albumDelete, PoemUpload]);
+  }, [poemId, editingState, commentId, editingStateComment, albumDelete, PoemUpload, editing]);
 
   return (
     user && (
@@ -363,6 +398,36 @@ const Profile = () => {
                     <p className="card-text">Követés: {following.length}</p>
                   </div>
                 </div>
+                {editing ? (
+                  // Szerkesztési űrlap
+                  <div className="row">
+                    <div className="col-11">
+                      <textarea
+                        className="form-control"
+                        rows="4"
+                        value={editedBio}
+                        onChange={(e) => setEditedBio(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-11">
+                      <button className="m-2 btn btn-primary" onClick={handleSaveClick}>
+                        Mentés
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Megjelenített szöveg és gomb
+                  <div className="row">
+                    <div className="col-11">
+                      <p className="card-text">{user.bio}</p>
+                    </div>
+                    <div className="col-11">
+                      <button className="m-2 btn btn-primary" onClick={editBio}>
+                        <FontAwesomeIcon icon={faPen} />
+                      </button>
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -385,109 +450,98 @@ const Profile = () => {
                         className="mb-4"
                       >
                         <div className="card">
-                          <div className="card-header">
-                            <strong>{poem.title} - {poem.visible===1?(<span>Látható</span>):(<span>Rejtett</span>)} - {poem.comment===1?(<span>Kommentek</span>):(<span>No Kommentek</span>)}</strong>
-                          </div>
-                          <div className="card-body">
-                            <blockquote>
-                              <p>{renderContentWithLineBreaks(poem)}</p>
-                              <footer className="blockquote-footer">
-                                <cite>
-                                  <strong>{poem.author}</strong>
-                                  <p>{poem.creationDate.split("T")[0]}</p>
-                                </cite>
-                              </footer>
-                            </blockquote>
-
-                            <div className="row">
-                              {editingState[poem.id]?.editing ? (
-                                <>
-                                  <form onSubmit={(e) => handleEditSubmit(poem.id, e)}>
-                                    <div className="form-group">
-                                      <label htmlFor="title">Title:</label>
-                                      <input
-                                        type="text"
-                                        className="form-control"
-                                        id="title"
-                                        name="title"
-                                        value={editingState[poem.id]?.editedPoem.title || ""}
-                                        onChange={handleInputChange}
-                                      />
-                                    </div>
-                                    <div className="form-group">
-                                      <label htmlFor="content">Content:</label>
-                                      <textarea
-                                        className="form-control"
-                                        id="content"
-                                        name="content"
-                                        value={editingState[poem.id]?.editedPoem.content || ""}
-                                        onChange={handleInputChange}
-                                        style={{ height: "450px" }}
-                                      />
-                                    </div>
-                                    <button type="submit" className="btn btn-primary mt-2 w-100"><FontAwesomeIcon icon={faPen} /></button>
-                                    <button className="btn btn-primary mt-2 w-100" onClick={handleBack}>
-                                    Vissza
-                                  </button>
-                                  </form>
-                                </>
-                                ) : (
-                                  <>
-                                    <div className="col-6 d-flex align-items-center justify-content-center">
-                                      <form onSubmit={handleDelete}>
-                                        <label>
-                                          <input
-                                            type="text"
-                                            name="poemId"
-                                            value={poem.id}
-                                            style={{ display: "none" }}
-                                            readOnly
-                                          />
-                                        </label>
-                                        <button type="submit" className="btn btn-danger">
-                                          <FontAwesomeIcon icon={faTrashAlt} />
-                                        </button>
-                                      </form>
-                                    </div>
-                                    <div className="col-6 d-flex align-items-center justify-content-center">
-                                      <button className="btn btn-primary m-1" onClick={() => handleEditClick(poem.id, poem)}>
-                                        <FontAwesomeIcon icon={faPen} />
-                                      </button>
-                                      {/* Vosoble */}
-                                      {poem.visible===1? (
-                                        <button className="btn btn-danger m-1" onClick={() => handleVisibleClick(poem.id, poem)}>
-                                          <FontAwesomeIcon icon={faEyeSlash} />
-                                        </button>
-                                      ) : (
-                                        <button className="btn btn-primary m-1" onClick={() => handleVisibleClick(poem.id, poem)}>
-                                          <FontAwesomeIcon icon={faEye} />
-                                        </button>
-                                      )}
-                                      {/* Kommentek kikapcsolasa */}
-                                      {poem.comment===1? (
-                                        <button className="btn btn-danger m-1" onClick={() => handleCommentVisibleClick(poem.id, poem)}>
-                                          <FontAwesomeIcon icon={faCommentSlash} />
-                                        </button>
-                                      ) : (
-                                        <button className="btn btn-primary m-1" onClick={() => handleCommentVisibleClick(poem.id, poem)}>
-                                          <FontAwesomeIcon icon={faComment} />
-                                        </button>
-                                      )}
-                                    </div>
-                                  </>
-                              )}
-                            </div>
-
+                        <div className="card-header d-flex justify-content-between">
+                            <strong>{poem.title} - {poem.visible === 1 ? (<span>Látható</span>) : (<span>Rejtett</span>)} - {poem.comment === 1 ? (<span>Kommentek</span>) : (<span>No Kommentek</span>)}</strong>
                             <div className="text-center">
                               <span className="m-2"><FontAwesomeIcon icon={faHeart} /> {poem.likes.length} </span>
-                              {/* <ul>
-                                {poem.likes.map((like, index) => (
-                                  <li key={index}>{like.username}</li>
-                                ))}
-                              </ul> */}
-
                               <span className="m-2"><FontAwesomeIcon icon={faComment} /> {poem.comments.length} </span>
                             </div>
+                          </div>
+                          <div className="card-body">
+                            {editingState[poem.id]?.editing ? (
+                              <>
+                                <form onSubmit={(e) => handleEditSubmit(poem.id, e)}>
+                                  <div className="form-group">
+                                    <label htmlFor="title">Title:</label>
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      id="title"
+                                      name="title"
+                                      value={editingState[poem.id]?.editedPoem.title || ""}
+                                      onChange={handleInputChange}
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label htmlFor="content">Content:</label>
+                                    <textarea
+                                      className="form-control"
+                                      id="content"
+                                      name="content"
+                                      value={editingState[poem.id]?.editedPoem.content || ""}
+                                      onChange={handleInputChange}
+                                      style={{ height: "450px" }}
+                                    />
+                                  </div>
+                                  <button type="submit" className="btn btn-primary m-2 w-25"><FontAwesomeIcon icon={faFloppyDisk} /></button>
+                                  <button className="btn btn-primary m-2 w-25" onClick={handleBack}>
+                                    Vissza
+                                  </button>
+                                </form>
+                              </>
+                              ) : (
+                                <>
+                                  <blockquote>
+                                    <p>{renderContentWithLineBreaks(poem)}</p>
+                                    <footer className="blockquote-footer">
+                                      <cite>
+                                        <strong>{poem.author}</strong>
+                                        <p>{poem.creationDate.split("T")[0]}</p>
+                                      </cite>
+                                    </footer>
+                                  </blockquote>
+
+                                  <div className="col-6 d-flex align-items-center justify-content-center">
+                                    <form onSubmit={handleDelete}>
+                                      <label>
+                                        <input
+                                          type="text"
+                                          name="poemId"
+                                          value={poem.id}
+                                          style={{ display: "none" }}
+                                          readOnly
+                                        />
+                                      </label>
+                                      <button type="submit" className="btn btn-danger">
+                                        <FontAwesomeIcon icon={faTrashAlt} />
+                                      </button>
+                                    </form>
+                                    <button className="btn btn-primary m-1" onClick={() => handleEditClick(poem.id, poem)}>
+                                      <FontAwesomeIcon icon={faPen} />
+                                    </button>
+                                    {/* Vosoble */}
+                                    {poem.visible===1? (
+                                      <button className="btn btn-danger m-1" onClick={() => handleVisibleClick(poem.id, poem)}>
+                                        <FontAwesomeIcon icon={faEyeSlash} />
+                                      </button>
+                                    ) : (
+                                      <button className="btn btn-primary m-1" onClick={() => handleVisibleClick(poem.id, poem)}>
+                                        <FontAwesomeIcon icon={faEye} />
+                                      </button>
+                                    )}
+                                    {/* Kommentek kikapcsolasa */}
+                                    {poem.comment===1? (
+                                      <button className="btn btn-danger m-1" onClick={() => handleCommentVisibleClick(poem.id, poem)}>
+                                        <FontAwesomeIcon icon={faCommentSlash} />
+                                      </button>
+                                    ) : (
+                                      <button className="btn btn-primary m-1" onClick={() => handleCommentVisibleClick(poem.id, poem)}>
+                                        <FontAwesomeIcon icon={faComment} />
+                                      </button>
+                                    )}
+                                  </div>
+                                </>
+                            )}
                             <ul className="list-group list-group-flush mb-4">
                               {poem.comments && poem.comments.map((comment, index) => (
                                 <li

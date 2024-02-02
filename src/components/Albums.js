@@ -46,9 +46,9 @@ const Albums = () => {
         <ul className="list-unstyled">
           {albums.map((album, index) => (
             <li key={index}>
-              <div className="card m-4">
+              <div className="card card-animated m-4">
                 <div className="card-header">
-                  <Link to={`/albums/${index}`}>
+                  <Link to={`/albums/${index}`} className='text-dark'>
                     <strong>{album.title}</strong>
                   </Link>
                 </div>
@@ -60,7 +60,7 @@ const Albums = () => {
                     <li key={index2} className="m-3">
                       <div className="card">
                         <div className="card-header">
-                          <Link to={`/poems/-${index}.${index2}`}>
+                          <Link to={`/poems/-${index}.${index2}`} className='text-dark'>
                             <strong>{poem.title}</strong>
                           </Link>
                         </div>
